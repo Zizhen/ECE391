@@ -1,0 +1,53 @@
+swap:
+    PUSHL %EBP
+    MOVL %ESP, %EBP
+    SUBL $8, %ESP
+    PUSHL %EBX
+    PUSHL %ESI
+    PUSHL %EDI
+
+    MOVL 8(%EBP), %EAX
+    MOVL 12(%EBP), %EBX
+    PUSHL %EAX
+    MOVL %EBX, %EAX
+    MOVL -4(%ESP), %EBX
+    ADD $4, %ESP
+    POPL %EDI
+    POPL %ESI
+    POPL %EBX
+    LEAVE
+    RET
+
+sort:
+    PUSHL %EBP
+    MOVL %ESP, %EBP
+    SUBL $8, %ESP
+    PUSHL %EBX
+    PUSHL %ESI
+    PUSHL %EDI
+
+    MOVL 8(%EBP), %EAX
+    MOVL 12(%EBP), %EBX
+    SUBL $8, %ESP
+label3:
+    MOVL $0, -20(%EBP)
+    MOVL 12(%EBP), -16(%EBP)
+    SUBL $1, -16(%EBP)
+    CMPL $0, -16(%EBP)
+    JBE label2
+    MOVL 8(%EBP), %EDX
+    MOVL -16(%EBP), %ESI
+    ADDL %ESI, %EDX
+    MOVL %EDX, %ESI
+    MOVL -4(%EDX), %EDI
+    CMPL %ESI, %EDI
+    JSE label1
+    LEAL %EDX, -24(%EBP)
+    LEAL -4(%EX), -28(%EBP)
+    CALL swap
+    MOVL $1, -20(%EBP)
+    SUBL $-1, -16(%EBP)
+    CMPL $0, -20(%EBP)
+    JE label3
+    LEAVE
+    RET
