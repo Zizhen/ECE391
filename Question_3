@@ -1,0 +1,83 @@
+abc:
+  pushl %ebp
+  movl %esp, %ebp           ;initialize
+  xorl %edx, %edx           ;clear edx
+  movl 8(%ebp), %eax        ;EAX <- M[EBP+8], the "next" field
+label1:
+  testl %eax, %eax          ;if(mostSigFig[EAX&EAX] == 0)||if(EAX == 0)
+  je label2                 ;jump to label2
+  pushl %eax                ;else
+  pushl %edx
+  pushl (%eax)
+  pushl $2
+  pushl $4                  ;call function(4,2,M[EAX])
+  call label3
+  addl $12, %esp
+  popl %edx
+  addl %eax, %edx           ;result = result+b
+  popl %eax
+  movl 4(%eax), %eax        ;a = a->next
+  jmp label1
+label2:
+  movl %edx, %eax
+  leave
+  ret
+label3:
+  pushl %ebp
+  movl %esp, %ebp
+  movl 16(%ebp), %ecx         ;ECX <- EDX
+  cmpl $4, %ecx               ;if(ECX-4 >= 0)
+  jae label8                  ;jmp to label8
+  movl 8(%ebp), %eax          ;else EAX <- 2
+  jmp *label10(, %ecx, 4)     ;jmp to*(label+4*ecx)
+label4:
+  addl 12(%ebp), %eax         ;EAX <- M[EAX]+2
+  jmp label9
+label5:
+  subl 12(%ebp), %eax         ;EAX <- M[EAX]-2
+  jmp label9
+label6:
+  imull 12(%ebp), %eax        ;EAX <- M[EAX]*2
+  jmp label9
+label7:
+  xorl %edx, %edx             ;EDX = EDX^EDX
+  idivl 12(%ebp)              ;M[EAX]/2
+  jmp label9
+label8:
+  movl $-1, %eax              ;EAX = EAX-1
+label9:
+  leave
+  ret
+label10:
+  .long label4, label5, label6, label7
+
+Answer:
+int abc(node* a){
+    int d = 0; //clear edx
+    int b;
+    while(a->next == NULL){
+        b = label3(4,2,a->next);
+        d += b;
+        a = a->next;
+    }
+    return d;
+}
+
+int label3(int c, int d, int data){
+    int a;
+    if(data >= 4)
+        a = -1;
+    else{
+        switch(data){
+            case 0:
+                a = c+d;
+            case 1:
+                a = c-d;
+            case 2:
+                a = c*d;
+            case 3:
+                a = c/d;
+        }
+    }
+    return a;
+}
