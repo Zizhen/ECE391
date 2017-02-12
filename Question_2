@@ -1,0 +1,55 @@
+swap:
+    PUSHL %EBP
+    MOVL %ESP, %EBP
+    SUBL $8, %ESP
+    PUSHL %EBX
+    PUSHL %ESI
+    PUSHL %EDI
+
+    MOVL 8(%EBP), %EAX
+    MOVL 12(%EBP), %EBX       ;assign 2 registers with parameters
+    PUSHL %EAX                ;temp = *a
+    MOVL %EBX, %EAX           ;*a = *b
+    MOVL -4(%ESP), %EBX       ;*b = temp
+    ADD $4, %ESP              ;restore ESP
+    POPL %EDI
+    POPL %ESI
+    POPL %EBX
+    LEAVE
+    RET                       ;tear down the frame
+
+sort:
+    PUSHL %EBP
+    MOVL %ESP, %EBP
+    SUBL $8, %ESP
+    PUSHL %EBX
+    PUSHL %ESI
+    PUSHL %EDI
+
+    MOVL 8(%EBP), %EAX        ;assign registers with parameters
+    MOVL 12(%EBP), %EBX
+    SUBL $8, %ESP             ;makes space for int i, swapped
+label3:                       ;do-while loop
+    MOVL $0, -20(%EBP)        ;swapped = 0
+    MOVL 12(%EBP), -16(%EBP)
+    SUBL $1, -16(%EBP)        ;i = size -1
+    CMPL $0, -16(%EBP)
+    JBE label2                ;while i > 0
+    MOVL 8(%EBP), %EDX
+    MOVL -16(%EBP), %ESI
+    ADDL %ESI, %EDX
+    MOVL %EDX, %ESI           ;ESI->list[i]
+    MOVL -4(%EDX), %EDI       ;EDI->list[i-1]
+    CMPL %ESI, %EDI
+    JSE label1                ;if list[i] < list[i-1]
+    LEAL %EDX, -24(%EBP)
+    LEAL -4(%EX), -28(%EBP)   ;swap subroutine
+    CALL swap
+    MOVL $1, -20(%EBP)
+label1:
+    SUBL $-1, -16(%EBP)       ;end of if loop
+label2:
+    CMPL $0, -20(%EBP)        ;end of while loop
+    JE label3
+    LEAVE
+    RET
